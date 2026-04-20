@@ -1,0 +1,47 @@
+header {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 1px;
+    text-align: center;
+    border-radius: 1px;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url("../images/Background.png");
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0%;
+    padding: 0%;
+}
+
+.about-me {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 1000px;
+}
+
+main {
+    flex-grow: 1;
+}
+
+.silly-image {
+    display: flex;
+    justify-content: center;
+}
+
+.silly-image>img {
+    max-width: 190px;
+    max-height: 900px;
+}
+
+.credits {
+    text-align: center;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 15px;
+    font-weight: bold;
+}
