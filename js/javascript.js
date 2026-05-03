@@ -32,11 +32,10 @@ let currentAnime = [];
 // Despues de llamar a la api gurado los datos en animePool para usarlos despues.
 // Y por cierto, de normal, si llamas a la API el navegador te bloquea la conexion directa por motivos de seguridad.
 // Así que el apaño que he tenido que buscar es usar un servidor proxy gratis para que haga de intermedio entre yo y la API.
-// Por eso en el fetch de abajo, uso el proxy corsproxy.io y ademas encapsulo la URL de la API con encodeURIComponent 
-// para que no haya problemas con caracteres especiales.
+// Por eso en el fetch de abajo, uso el proxy corsproxy.io.
 function loadAnimePool() {
     const targetUrl = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=500";
-    fetch("https://corsproxy.io/?" + encodeURIComponent(targetUrl), { headers })
+    fetch("https://corsproxy.io/?" + targetUrl, { headers })
         .then(response => {
             console.log("Respuesta:", response);
 
@@ -59,10 +58,10 @@ function loadAnimePool() {
 }
 
 // Funcion para obtener todos los detalles de un anime, como la puntuación y la imagen.
-// Tambien usa el proxy y encodeURIComponent por las mismas razones que la funcion anterior.
+// Tambien usa el proxy por las mismas razones que la funcion anterior.
 function getAnimeDetails(id) {
     const targetUrl = `https://api.myanimelist.net/v2/anime/${id}?fields=title,mean,main_picture`;
-    return fetch("https://corsproxy.io/?" + encodeURIComponent(targetUrl), { headers })
+    return fetch("https://corsproxy.io/?" + targetUrl, { headers })
         .then(response => {
             console.log("Respuesta:", response);
 
@@ -88,9 +87,7 @@ function getRandomPair() {
     return [anime1, anime2];
 }
 
-// Esta funcion actualiza el html para mostrar la nueva imagen del anime y su nombre
-// Ademas tambien guarda la puntuacion (o rating) en el dataset del titulo. Antes lo guardaba en la misma carta pero entonces la funcion de onclick mas adelante tambien 
-// funcionaba al hacerle click a la carta y yo solo queria que funcionara al hacerle click al titulo que en verdad es un boton.
+// Esta funcion actualiza el html para mostrar la nueva imagen del anime y su nombre.
 function updateCard(card, anime) {
     const img = card.querySelector("img");
     const title = card.querySelector(".anime-title");
@@ -126,8 +123,7 @@ function newRound() {
 
 // Aqui es donde he tenido muchos problemas, por que no sabia como guardar la puntuacion de los animes
 // y ademas queria que funcionara al hacerle click al titulo que en verdad es un boton.
-// Entonces al final como he dicho antes lo que he hecho es guardar la puntuacion en el dataset del titulo.
-// Y una vez le haces click a un boton saca la puntuacion de los dos animes y compara la del anime que has elegido con el otro.
+// Una vez le haces click a un boton saca la puntuacion de los dos animes y compara la del anime que has elegido con el otro.
 // Si es mayor o igual entonces es correcto y te dice que lo es, si no, te dice que es incorrecto.
 // Y por ultimo empieza una ronda nueva.
 function setupClicks() {
