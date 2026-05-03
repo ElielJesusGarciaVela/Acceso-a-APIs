@@ -3,7 +3,7 @@
 // Mientras que no pierdas mi ID entonces no hay problemas, en caso de que lo pierdas sin querer mandame un correo Sergio.
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM is fully loaded and parsed");
+    console.log("DOM cargado!");
     initialize();
     playMusic();
 });
@@ -26,6 +26,7 @@ const headers = {
 };
 
 let animePool = [];
+let currentAnime = [];
 
 // Funcion para llamar a la API, de momento solo he conseguido obtener 300 animes, por que la llamada tiene un limite.
 // Despues de llamar a la api gurado los datos en animePool para usarlos despues.
@@ -34,7 +35,7 @@ let animePool = [];
 // Por eso en el fetch de abajo, uso el proxy corsproxy.io y ademas encapsulo la URL de la API con encodeURIComponent 
 // para que no haya problemas con caracteres especiales.
 function loadAnimePool() {
-    const targetUrl = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=300";
+    const targetUrl = "https://api.myanimelist.net/v2/anime/ranking?ranking_type=all&limit=500";
     fetch("https://corsproxy.io/?" + encodeURIComponent(targetUrl), { headers })
         .then(response => {
             console.log("Respuesta:", response);
@@ -78,13 +79,13 @@ function getAnimeDetails(id) {
 // Funcion para elegir dos animes al azar de la piscina.
 // Ademas mientras que el anime elegido sea el mismo que el anterior, se vuelve a elegir otro.
 function getRandomPair() {
-    const a = animePool[Math.floor(Math.random() * animePool.length)];
-    let b = animePool[Math.floor(Math.random() * animePool.length)];
-    while (a.id === b.id) {
-        b = animePool[Math.floor(Math.random() * animePool.length)];
+    const anime1 = animePool[Math.floor(Math.random() * animePool.length)];
+    let anime2 = animePool[Math.floor(Math.random() * animePool.length)];
+    while (anime1.id === anime2.id) {
+        anime2 = animePool[Math.floor(Math.random() * animePool.length)];
     }
 
-    return [a, b];
+    return [anime1, anime2];
 }
 
 // Esta funcion actualiza el html para mostrar la nueva imagen del anime y su nombre
@@ -94,10 +95,8 @@ function updateCard(card, anime) {
     const img = card.querySelector("img");
     const title = card.querySelector(".anime-title");
 
-    img.src = anime.main_picture?.large || anime.main_picture?.medium || "";
+    img.src = anime.main_picture?.large || anime.main_picture?.medium;
     title.textContent = anime.title;
-
-    title.dataset.rating = anime.mean;
 }
 
 // Esta funcion empieza una ronda nueva.
@@ -106,15 +105,17 @@ function newRound() {
 
     const cards = document.querySelectorAll(".anime-card");
 
-    const [a, b] = getRandomPair();
+    const [anime1, anime2] = getRandomPair();
+    
 
-    getAnimeDetails(a.id)
+    getAnimeDetails(anime1.id)
         .then(anime1 => {
             console.log("Anime 1 conseguido:", anime1);
-            return getAnimeDetails(b.id).then(anime2 => {
+            return getAnimeDetails(anime2.id).then(anime2 => {
                 console.log("Anime 2 conseguido:", anime2);
                 updateCard(cards[0], anime1);
                 updateCard(cards[1], anime2);
+                currentAnime = [anime1, anime2];
             });
         })
         .catch(error => {
@@ -140,8 +141,8 @@ function setupClicks() {
     let highscore = 0;
 
     buttons[0].addEventListener("click", () => {
-        const rating0 = parseFloat(buttons[0].dataset.rating);
-        const rating1 = parseFloat(buttons[1].dataset.rating);
+        const rating0 = currentAnime[0].mean;
+        const rating1 = currentAnime[1].mean;
         scoreContainer.classList.remove("correct-border", "incorrect-border");
         if (rating0 >= rating1) {
             result.innerHTML = "<p class='correct'>Correcto</p>";
@@ -163,8 +164,8 @@ function setupClicks() {
     });
 
     buttons[1].addEventListener("click", () => {
-        const rating0 = parseFloat(buttons[0].dataset.rating);
-        const rating1 = parseFloat(buttons[1].dataset.rating);
+        const rating0 = currentAnime[0].mean;
+        const rating1 = currentAnime[1].mean;
         scoreContainer.classList.remove("correct-border", "incorrect-border");
         if (rating1 >= rating0) {
             result.innerHTML = "<p class='correct'>Correcto</p>";
